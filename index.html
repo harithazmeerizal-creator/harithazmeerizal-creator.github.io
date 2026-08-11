@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mohamad Harith | Game Developer &amp; 3D Artist</title>
+<meta name="description" content="Mohamad Harith bin Azmeerizal, Game Technology undergraduate at UTeM. Unity multiplayer systems, VR, 3D art and design. Available for internship, Sept 2026 to Mar 2027.">
+<meta property="og:title" content="Mohamad Harith | Game Developer &amp; 3D Artist">
+<meta property="og:description" content="Unity multiplayer systems, VR, and 3D art from a Game Technology undergraduate at UTeM.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://static.wixstatic.com/media/83b0d5_8694c72375ce4ba084f87d9fac461004~mv2.png/v1/fill/w_1200,h_630,al_c,q_85,enc_avif,quality_auto/83b0d5_8694c72375ce4ba084f87d9fac461004~mv2.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DUSK — indigo-plum ground, cool blue at rest, amber at effort.
+   The rail heats from blue to amber as the payload advances.
+   Amber is reserved for the payload and for live signals.
+   ============================================================ */
+:root{
+  --bg:#12101C; --panel:#191627; --panel-2:#221D33; --sink:#0C0A14;
+  --text:#EDEAF5; --text-2:#A29CBA; --text-3:#726C8C;
+  --line:#2C2740; --line-2:#3A3352;
+  --cool:#4C7DFF; --hot:#FFA62B;
+  --f-display:"Bricolage Grotesque",system-ui,sans-serif;
+  --f-body:"Instrument Sans",system-ui,sans-serif;
+  --f-mono:"Space Mono",ui-monospace,monospace;
+  --pad:clamp(20px,5vw,72px); --rail:64px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--f-body);font-size:17px;
+  line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body.locked{overflow:hidden}
+a{color:inherit}
+img{max-width:100%;display:block}
+::selection{background:var(--hot);color:var(--sink)}
+:focus-visible{outline:2px solid var(--cool);outline-offset:3px}
+
+.wrap{max-width:1180px;margin:0 auto;padding-left:var(--pad);padding-right:var(--pad)}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3)}
+.eyebrow b{color:var(--cool);font-weight:400}
+.h2{font-family:var(--f-display);font-weight:800;font-size:clamp(29px,4.6vw,52px);
+  line-height:1.03;letter-spacing:-.025em;margin:12px 0 30px;max-width:20ch}
+
+/* ================= THE ESCORT ROUTE ================= */
+.route{position:fixed;left:0;top:0;bottom:0;width:var(--rail);z-index:60;display:flex;
+  flex-direction:column;align-items:center;padding:26px 0;
+  background:linear-gradient(90deg,var(--sink),transparent)}
+.route__track{position:relative;flex:1;width:2px;background:var(--line);margin:18px 0}
+.route__done{position:absolute;top:0;left:0;width:2px;height:0;
+  background-image:linear-gradient(to bottom,var(--cool),var(--hot));
+  background-repeat:no-repeat}
+.route__payload{position:absolute;left:50%;top:0;width:19px;height:19px;
+  transform:translate(-50%,-50%) rotate(45deg);background:var(--hot);
+  box-shadow:0 0 18px rgba(255,166,43,.55)}
+.route__payload span{position:absolute;inset:5px;background:var(--sink)}
+.cp{position:absolute;left:50%;top:var(--pos);transform:translate(-50%,-50%);width:34px;height:34px;
+  display:grid;place-items:center;text-decoration:none}
+.cp i{width:8px;height:8px;background:var(--bg);border:2px solid var(--line-2);border-radius:50%;
+  transition:background .2s,border-color .2s,transform .2s}
+.cp.is-on i{background:var(--cool);border-color:var(--cool);transform:scale(1.3)}
+.cp em{position:absolute;left:34px;font-style:normal;font-family:var(--f-mono);font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;background:var(--text);
+  color:var(--sink);padding:3px 8px;opacity:0;transform:translateX(-6px);
+  transition:opacity .18s,transform .18s;pointer-events:none}
+.cp:hover em,.cp:focus-visible em{opacity:1;transform:translateX(0)}
+.route__cap{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;color:var(--text-3)}
+
+/* ================= HEADER ================= */
+.top{position:fixed;top:0;left:var(--rail);right:0;z-index:50;display:flex;justify-content:space-between;
+  align-items:center;padding:15px var(--pad);background:rgba(18,16,28,.82);backdrop-filter:blur(10px);
+  border-bottom:1px solid transparent;transition:border-color .2s}
+.top.is-stuck{border-color:var(--line)}
+.mark{font-family:var(--f-display);font-weight:800;letter-spacing:-.02em;font-size:19px;text-decoration:none}
+.mark b{color:var(--cool)}
+.top__cta{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;
+  text-decoration:none;border:1px solid var(--line-2);padding:9px 15px;color:var(--text-2);
+  transition:background .18s,color .18s,border-color .18s}
+.top__cta:hover{background:var(--hot);border-color:var(--hot);color:var(--sink)}
+
+/* ================= HERO ================= */
+.hero{margin-left:var(--rail);padding-top:clamp(116px,16vh,180px);padding-bottom:52px;position:relative;overflow:hidden}
+.hero__status{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.dot{width:8px;height:8px;background:var(--hot);border-radius:50%;position:relative}
+.dot::after{content:"";position:absolute;inset:-5px;border:1px solid var(--hot);border-radius:50%;opacity:.4}
+.hero h1{font-family:var(--f-display);font-weight:800;font-size:clamp(46px,11.5vw,146px);
+  line-height:.86;letter-spacing:-.045em;text-transform:uppercase}
+.hero h1 .thin{font-weight:500;color:var(--text-2);display:block;font-size:.4em;letter-spacing:-.01em;
+  text-transform:none;margin-top:16px;max-width:22ch}
+.hero__lede{max-width:46ch;margin-top:28px;font-size:clamp(17px,2vw,20px);color:var(--text-2)}
+.hero__lede strong{color:var(--text);font-weight:600}
+.hero__meta{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:32px;font-family:var(--f-mono);
+  font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3)}
+.hero__meta span b{color:var(--text-2);font-weight:400}
+.tape{margin-top:54px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  background:var(--panel);overflow:hidden;white-space:nowrap}
+.tape__row{display:inline-flex;padding:11px 0;animation:slide 30s linear infinite}
+.tape__row span{font-family:var(--f-mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+  padding:0 22px;color:var(--text-2)}
+.tape__row span::after{content:"◆";margin-left:22px;color:var(--hot);opacity:.7}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ================= SECTIONS ================= */
+section{margin-left:var(--rail);padding:clamp(64px,9vh,104px) 0;position:relative}
+.band{background:var(--sink)}
+.about{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,72px);align-items:start}
+.about p{margin-bottom:18px;color:var(--text-2)}
+.about p strong{color:var(--text);font-weight:600}
+.portrait{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:center 18%;
+  border:1px solid var(--line-2);background:var(--panel)}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);margin-top:26px}
+.stat{background:var(--bg);padding:20px}
+.stat b{display:block;font-family:var(--f-display);font-weight:800;font-size:clamp(26px,3.6vw,38px);
+  line-height:1;letter-spacing:-.03em}
+.stat em{display:block;font-style:normal;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text-3);margin-top:8px}
+
+/* ================= WORK ================= */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.card{background:var(--panel);border:1px solid var(--line);padding:clamp(18px,2vw,24px);
+  display:flex;flex-direction:column;text-align:left;color:inherit;font:inherit;cursor:pointer;
+  transition:border-color .22s,background .22s,transform .22s;width:100%}
+.card:hover,.card:focus-visible{background:var(--panel-2);border-color:var(--line-2);transform:translateY(-3px)}
+.card__media{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--sink);margin-bottom:18px}
+.card__media img,.card__media video{width:100%;height:100%;object-fit:cover;
+  transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.card:hover .card__media img,.card:hover .card__media video{transform:scale(1.04)}
+.card__count{position:absolute;right:8px;bottom:8px;background:rgba(12,10,20,.86);color:var(--text-2);
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;padding:4px 8px}
+.card__no{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;color:var(--hot)}
+.card h3{font-family:var(--f-display);font-weight:700;font-size:clamp(20px,2.2vw,25px);line-height:1.12;
+  letter-spacing:-.02em;margin:12px 0 10px}
+.card p{color:var(--text-2);font-size:15px}
+.spec{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);
+  border:1px solid var(--line);margin-top:18px}
+.spec div{background:var(--panel);padding:11px 13px;transition:background .22s}
+.card:hover .spec div{background:var(--panel-2)}
+.spec em{display:block;font-style:normal;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--text-3);margin-bottom:4px}
+.spec b{font-weight:500;font-size:13.5px;color:var(--text)}
+.card__open{margin-top:18px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--cool)}
+.card--lead{grid-column:1 / -1;display:grid;grid-template-columns:1fr .9fr;
+  gap:clamp(20px,3vw,38px);align-items:center;border-left:2px solid var(--hot)}
+.card--lead .card__media{margin-bottom:0;aspect-ratio:16/11}
+.card--lead__text{display:flex;flex-direction:column}
+.card--lead h3{font-size:clamp(25px,3.2vw,36px)}
+.card--lead p{font-size:16px}
+.card--lead .spec{grid-template-columns:repeat(4,1fr)}
+
+/* ================= SKILLS ================= */
+.stack{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(24px,4vw,56px)}
+.stack h4{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--cool);margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.stack section{padding:0;margin:0 0 34px}
+.meter{margin-bottom:15px}
+.meter__top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.meter__top b{font-weight:500;font-size:15.5px}
+.meter__top em{font-style:normal;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--text-3)}
+.meter__bar{height:4px;background:var(--line);position:relative;overflow:hidden}
+.meter__fill{position:absolute;top:0;left:0;bottom:0;width:0;
+  background:linear-gradient(90deg,var(--cool),var(--hot));transition:width 1.1s cubic-bezier(.2,.7,.2,1)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line-2);padding:7px 12px;font-family:var(--f-mono);font-size:11px;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--text-2)}
+
+/* ================= BACKGROUND ================= */
+.legs{border-top:1px solid var(--line)}
+.leg{display:grid;grid-template-columns:170px 1fr;gap:clamp(14px,3vw,44px);padding:22px 0;
+  border-bottom:1px solid var(--line);align-items:start}
+.leg time{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;color:var(--text-3);padding-top:5px}
+.leg h4{font-family:var(--f-display);font-weight:700;font-size:19px;letter-spacing:-.01em}
+.leg .who{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--hot);margin-bottom:5px}
+.leg p{color:var(--text-2);font-size:15.5px;margin-top:5px}
+
+/* ================= CONTACT ================= */
+.contact h2{font-family:var(--f-display);font-weight:800;text-transform:uppercase;
+  font-size:clamp(38px,8vw,98px);line-height:.9;letter-spacing:-.04em}
+.contact h2 span{background:linear-gradient(90deg,var(--cool),var(--hot));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.links{display:flex;flex-wrap:wrap;gap:11px;margin-top:34px}
+.btn{display:inline-flex;align-items:center;font-family:var(--f-mono);font-size:12px;letter-spacing:.09em;
+  text-transform:uppercase;text-decoration:none;border:1px solid var(--line-2);background:transparent;
+  color:var(--text);padding:13px 19px;cursor:pointer;transition:background .18s,color .18s,border-color .18s}
+.btn:hover{background:var(--text);color:var(--sink);border-color:var(--text)}
+.btn--go{background:var(--hot);border-color:var(--hot);color:var(--sink)}
+.btn--go:hover{background:var(--text);border-color:var(--text)}
+.foot{margin-left:var(--rail);border-top:1px solid var(--line);padding:24px var(--pad);display:flex;
+  justify-content:space-between;flex-wrap:wrap;gap:10px 24px;font-family:var(--f-mono);font-size:11px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--text-3)}
+.foot a{text-decoration:none}
+.foot a:hover{color:var(--text)}
+
+/* ================= PROJECT SHEET ================= */
+.sheet{position:fixed;inset:0;z-index:100;background:var(--bg);overflow-y:auto;display:none}
+.sheet.is-open{display:block}
+.sheet__bar{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;
+  gap:16px;padding:13px var(--pad);background:rgba(18,16,28,.94);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line)}
+.sheet__bar strong{font-family:var(--f-display);font-weight:700;font-size:16px;letter-spacing:-.01em}
+.sheet__close{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+  background:transparent;border:1px solid var(--line-2);color:var(--text);padding:9px 15px;cursor:pointer;
+  transition:background .18s,color .18s,border-color .18s}
+.sheet__close:hover{background:var(--hot);color:var(--sink);border-color:var(--hot)}
+.sheet__head{padding:clamp(34px,6vw,68px) var(--pad) 0;max-width:1180px;margin:0 auto}
+.sheet__head h2{font-family:var(--f-display);font-weight:800;font-size:clamp(30px,5.6vw,60px);
+  line-height:.98;letter-spacing:-.035em}
+.sheet__sub{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--hot)}
+.sheet__desc{max-width:62ch;margin-top:20px;color:var(--text-2);font-size:17px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);margin-top:30px}
+.fact{background:var(--panel);padding:17px}
+.fact em{display:block;font-style:normal;font-family:var(--f-mono);font-size:10px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--text-3);margin-bottom:6px}
+.fact b{font-weight:500;font-size:15px}
+.gal{max-width:1180px;margin:0 auto;padding:clamp(30px,4vw,54px) var(--pad) 90px;
+  display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.shot{background:var(--panel);border:1px solid var(--line);overflow:hidden}
+.shot img,.shot video{width:100%;height:auto;display:block;min-height:60px;background:var(--sink)}
+.shot--wide{grid-column:1 / -1}
+.shot figcaption{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--text-3);padding:10px 12px;border-top:1px solid var(--line)}
+.shot__yt{display:block;position:relative}
+.shot__yt::after{content:"▶";position:absolute;inset:0;display:grid;place-items:center;font-size:34px;
+  color:var(--text);background:rgba(12,10,20,.4)}
+
+.rise{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+.rise.is-in{opacity:1;transform:none}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width:860px){
+  :root{--rail:0px}
+  .route{left:0;right:0;top:auto;bottom:0;height:auto;width:100%;flex-direction:row;padding:0;
+    background:var(--sink);border-top:1px solid var(--line)}
+  .route__cap{display:none}
+  .route__track{width:100%;height:3px;margin:0;flex:1}
+  .route__done{height:3px;width:0;background-image:linear-gradient(to right,var(--cool),var(--hot))}
+  .route__payload{top:50%;left:0}
+  .cp{top:50%;left:var(--pos)}
+  .cp em{left:auto;bottom:16px;transform:translateY(6px)}
+  .cp:hover em,.cp:focus-visible em{transform:translateY(0)}
+  .about,.stack,.grid,.gal{grid-template-columns:1fr}
+  .card--lead{grid-template-columns:1fr}
+  .card--lead .card__media{margin-bottom:18px;order:-1}
+  .card--lead .spec{grid-template-columns:1fr 1fr}
+  .facts{grid-template-columns:1fr}
+  .leg{grid-template-columns:1fr;gap:6px}
+  .top__cta{display:none}
+  .foot{padding-bottom:36px}
+  body{padding-bottom:22px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important;transition:none!important}
+  .rise{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<nav class="route" aria-label="Page sections">
+  <span class="route__cap">START</span>
+  <div class="route__track" id="track">
+    <div class="route__done" id="done"></div>
+    <a class="cp" href="#about" data-cp="about" style="--pos:20%"><i></i><em>About</em></a>
+    <a class="cp" href="#work" data-cp="work" style="--pos:42%"><i></i><em>Work</em></a>
+    <a class="cp" href="#skills" data-cp="skills" style="--pos:62%"><i></i><em>Skills</em></a>
+    <a class="cp" href="#background" data-cp="background" style="--pos:80%"><i></i><em>Background</em></a>
+    <a class="cp" href="#contact" data-cp="contact" style="--pos:95%"><i></i><em>Contact</em></a>
+    <div class="route__payload" id="payload" aria-hidden="true"><span></span></div>
+  </div>
+  <span class="route__cap">GOAL</span>
+</nav>
+
+<header class="top" id="top">
+  <a class="mark" href="#hero">M.<b>Harith</b></a>
+  <a class="top__cta" href="#contact">Available for internship</a>
+</header>
+
+<div class="hero" id="hero">
+  <div class="wrap">
+    <div class="hero__status">
+      <span class="dot"></span>
+      <span class="eyebrow">Open for internship, Sept 2026 to Mar 2027</span>
+    </div>
+    <h1>Mohamad<br>Harith
+      <span class="thin">Game developer, 3D artist, and designer building multiplayer systems that get people moving.</span>
+    </h1>
+    <p class="hero__lede">Final-year <strong>Game Technology</strong> undergraduate at UTeM. I work in
+      <strong>Unity</strong> and <strong>Blender</strong> on networked gameplay, VR, and the 3D art that fills it.</p>
+    <div class="hero__meta">
+      <span><b>UTeM / Bachelor of IT (Game Technology)</b></span>
+      <span><b>CGPA 3.52 / Dean's List</b></span>
+      <span><b>Melaka, Malaysia</b></span>
+    </div>
+  </div>
+  <div class="tape"><div class="tape__row">
+    <span>Unity</span><span>Photon PUN 2</span><span>Blender</span><span>C#</span><span>Unreal Engine</span><span>VR</span><span>After Effects</span>
+    <span>Unity</span><span>Photon PUN 2</span><span>Blender</span><span>C#</span><span>Unreal Engine</span><span>VR</span><span>After Effects</span>
+  </div></div>
+</div>
+
+<section id="about">
+  <div class="wrap about rise">
+    <div>
+      <p class="eyebrow"><b>01</b> / About</p>
+      <h2 class="h2">I build the systems, then I build the art that goes in them.</h2>
+      <img class="portrait" src="portrait.jpg" alt="Mohamad Harith" loading="lazy">
+    </div>
+    <div>
+      <p>My studies focus on code and logic, but what I actually enjoy is making digital things that feel
+      good to use. Designing a 3D environment, solving a programming puzzle, learning whatever tool the
+      next idea needs.</p>
+      <p>Right now that means <strong>multiplayer networking and exergames</strong>: games that ask your
+      body to do something, not just your thumbs. Alongside the code I do <strong>freelance graphic
+      design</strong> for event posters and promotional work, and I served as Head of Usher for university events.</p>
+      <p>When I'm not behind a screen I'm on the <strong>softball field</strong>, playing for UTeM and Melaka
+      state. Sport taught me that communication and quick thinking matter as much on a team as they do in software.</p>
+      <div class="stats">
+        <div class="stat"><b>3.52</b><em>CGPA / Dean's List</em></div>
+        <div class="stat"><b>6</b><em>Projects shipped</em></div>
+        <div class="stat"><b>2023–27</b><em>BITE Game Technology</em></div>
+        <div class="stat"><b>Athlete</b><em>Softball &amp; baseball, Melaka</em></div>
+      </div>
+      <div class="links" style="margin-top:24px">
+        <a class="btn" href="https://6c5eacd0-ad0b-4cc8-8899-a6e2892ba6b5.filesusr.com/ugd/83b0d5_d161bf125c11412e8b463ba2ad2da6fb.pdf" target="_blank" rel="noopener">Download CV</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="work" class="band">
+  <div class="wrap rise">
+    <p class="eyebrow"><b>02</b> / Work</p>
+    <h2 class="h2">Games, VR, a security build, and the art for all of it.</h2>
+    <div class="grid" id="grid"></div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap rise">
+    <p class="eyebrow"><b>03</b> / Skills</p>
+    <h2 class="h2">What I actually reach for.</h2>
+    <div class="stack">
+      <div>
+        <section>
+          <h4>Game engines</h4>
+          <div class="meter"><div class="meter__top"><b>Unity</b><em>Advanced</em></div><div class="meter__bar"><span class="meter__fill" data-fill="92"></span></div></div>
+          <div class="meter"><div class="meter__top"><b>Unreal Engine</b><em>Intermediate</em></div><div class="meter__bar"><span class="meter__fill" data-fill="60"></span></div></div>
+        </section>
+        <section>
+          <h4>Programming</h4>
+          <div class="meter"><div class="meter__top"><b>C#</b><em>Primary</em></div><div class="meter__bar"><span class="meter__fill" data-fill="88"></span></div></div>
+          <div class="meter"><div class="meter__top"><b>C++</b><em>Working</em></div><div class="meter__bar"><span class="meter__fill" data-fill="55"></span></div></div>
+          <div class="meter"><div class="meter__top"><b>JavaScript</b><em>Working</em></div><div class="meter__bar"><span class="meter__fill" data-fill="55"></span></div></div>
+          <div class="meter"><div class="meter__top"><b>PHP &amp; MySQL</b><em>Working</em></div><div class="meter__bar"><span class="meter__fill" data-fill="58"></span></div></div>
+        </section>
+      </div>
+      <div>
+        <section>
+          <h4>3D &amp; creative</h4>
+          <div class="meter"><div class="meter__top"><b>Blender</b><em>Intermediate</em></div><div class="meter__bar"><span class="meter__fill" data-fill="72"></span></div></div>
+          <div class="meter"><div class="meter__top"><b>After Effects</b><em>Intermediate</em></div><div class="meter__bar"><span class="meter__fill" data-fill="64"></span></div></div>
+          <div class="meter"><div class="meter__top"><b>Photoshop</b><em>Working</em></div><div class="meter__bar"><span class="meter__fill" data-fill="58"></span></div></div>
+        </section>
+        <section>
+          <h4>Multiplayer &amp; XR</h4>
+          <div class="chips"><span class="chip">Photon PUN 2</span><span class="chip">Real-time networking</span>
+            <span class="chip">VR / Meta Quest</span><span class="chip">Exergame design</span></div>
+        </section>
+        <section>
+          <h4>Tools &amp; workflow</h4>
+          <div class="chips"><span class="chip">GitHub</span><span class="chip">Diversion</span><span class="chip">Trello</span>
+            <span class="chip">Ubuntu Server</span><span class="chip">VirtualBox</span></div>
+        </section>
+        <section>
+          <h4>Languages</h4>
+          <div class="chips"><span class="chip">Bahasa Melayu (Native)</span><span class="chip">English (Advanced)</span></div>
+        </section>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="background" class="band">
+  <div class="wrap rise">
+    <p class="eyebrow"><b>04</b> / Background</p>
+    <h2 class="h2">Where I've been putting the hours.</h2>
+    <div class="legs">
+      <div class="leg"><time>2024 to now</time><div>
+        <p class="who">Freelance</p><h4>Graphic designer</h4>
+        <p>Event posters and promotional material for clients and university events, working to real deadlines and real revisions.</p></div></div>
+      <div class="leg"><time>University events</time><div>
+        <p class="who">Head of Usher</p><h4>UTeM event committee</h4>
+        <p>Led the ushering team across faculty events, coordinating people and keeping the schedule moving on the day.</p></div></div>
+      <div class="leg"><time>2023 to now</time><div>
+        <p class="who">Athlete</p><h4>Softball &amp; baseball, UTeM and Melaka state</h4>
+        <p>Competing at national-level tournaments while carrying a full course load.</p></div></div>
+      <div class="leg"><time>2023 – 2027</time><div>
+        <p class="who">Education</p><h4>Universiti Teknikal Malaysia Melaka</h4>
+        <p>Bachelor of Information Technology (Game Technology) with Honours, programme BITE. CGPA 3.52, Dean's List.</p></div></div>
+      <div class="leg"><time>2021 – 2023</time><div>
+        <p class="who">Education</p><h4>Perak Matriculation College (KMPk)</h4>
+        <p>Gopeng, Perak. Science stream.</p></div></div>
+      <div class="leg"><time>2016 – 2020</time><div>
+        <p class="who">Education</p><h4>SMK Dato Haji Mohd Taib</h4>
+        <p>Ipoh, Perak. Science stream.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="contact">
+  <div class="wrap rise">
+    <p class="eyebrow"><b>05</b> / Contact</p>
+    <h2>Let's get<br>the payload<br><span>moving.</span></h2>
+    <p class="hero__lede">I'm looking for an internship from <strong>28 September 2026 to 12 March 2027</strong>
+      in game development, 3D art, or software engineering. Send me the brief and I'll tell you honestly if I can build it.</p>
+    <div class="links">
+      <a class="btn btn--go" href="mailto:harithazmeerizal@gmail.com">Email me</a>
+      <button class="btn" id="copy" type="button">Copy email address</button>
+      <a class="btn" href="https://www.linkedin.com/in/mohamadharith39/" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn" href="https://www.tiktok.com/@hrithazmrzl" target="_blank" rel="noopener">TikTok</a>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <span>Mohamad Harith bin Azmeerizal</span>
+  <span><a href="tel:+60195447525">+60 19-544 7525</a></span>
+  <span>Melaka, Malaysia</span>
+  <span>&copy; <span id="yr">2026</span></span>
+</footer>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet__bar">
+    <strong id="sheetBar">Project</strong>
+    <button class="sheet__close" id="sheetClose" type="button">Close</button>
+  </div>
+  <div class="sheet__head">
+    <p class="sheet__sub" id="sheetSub"></p>
+    <h2 id="sheetTitle"></h2>
+    <p class="sheet__desc" id="sheetDesc"></p>
+    <div class="facts">
+      <div class="fact"><em>Date</em><b id="sheetDate"></b></div>
+      <div class="fact"><em>Role</em><b id="sheetRole"></b></div>
+      <div class="fact"><em>Project type</em><b id="sheetType"></b></div>
+    </div>
+  </div>
+  <div class="gal" id="sheetGal"></div>
+</div>
+
+<script>
+const PROJECTS = [{"slug": "payload-escort", "title": "Payload Escort", "sub": "Final Year Project", "date": "2026 – Present", "role": "Solo Game Developer / Designer", "type": "Final Year Project · Unity 3D · Multiplayer · Mobile", "cover": "83b0d5_8694c72375ce4ba084f87d9fac461004~mv2.png", "desc": "An asymmetric cooperative multiplayer exergame built with Unity 3D and Photon PUN 2. Players take on distinct roles and work together to escort a payload to the objective, combining real-time online gameplay with physical activity. Designed to make exercise more engaging through competitive team-based mechanics.", "tags": ["Unity 3D", "Photon PUN 2", "C#", "Multiplayer", "Exergame"], "media": [{"t": "img", "id": "83b0d5_1748fc22992f47d28a10e9817b553117~mv2.png", "c": "Main menu scene"}, {"t": "img", "id": "83b0d5_e658eff017954992b36ce3eee6af1455~mv2.png", "c": "Lobby scene"}, {"t": "img", "id": "83b0d5_036345d6c3e34991ba0e1f597b4df417~mv2.png", "c": "Lobby scene"}, {"t": "img", "id": "83b0d5_96709a4aebf94fd4bca83906e8fcb566~mv2.png", "c": "Game scene"}, {"t": "img", "id": "83b0d5_73fa641fc9734eb09e1dffc922ec0536~mv2.png", "c": "Game scene"}, {"t": "img", "id": "83b0d5_4076a4eae7fa4904a62a4940f42c174f~mv2.png", "c": "HUD"}, {"t": "img", "id": "83b0d5_b2f3ae8612634bc9a893b387989da81f~mv2.png", "c": "Game world"}, {"t": "img", "id": "83b0d5_975ecb3d2db24602a8f579a526802596~mv2.png", "c": "World"}, {"t": "img", "id": "83b0d5_220a0a33d43d4c7bb316a23597cb446c~mv2.png", "c": "Greyboxing"}, {"t": "img", "id": "83b0d5_db477deade4e4e0685d048dd931e356f~mv2.png", "c": "Unity view"}, {"t": "img", "id": "83b0d5_ba9b5124c4794dcfab391ce349874375~mv2.png", "c": "Storyboard"}, {"t": "img", "id": "83b0d5_f9f2d0fe202248ac93af70f0b49de041~mv2.png", "c": "Flowboard"}, {"t": "img", "id": "83b0d5_65e12e3d00da49779f827cc526b2f9b9~mv2.png", "c": "Model"}, {"t": "img", "id": "83b0d5_017bb0f9c90b4b408e2c4a5f277b6792~mv2.png", "c": "Model"}, {"t": "img", "id": "83b0d5_3b1f1ab22115488b8848c5e78d72beea~mv2.png", "c": "Model"}, {"t": "img", "id": "83b0d5_80b82e9b93c647c290352ac5c1bd45d9~mv2.png", "c": "Model"}, {"t": "img", "id": "83b0d5_4e0ff2a6b8984221bb8c2e2ebeb9738f~mv2.png", "c": "Model"}, {"t": "img", "id": "83b0d5_a8b7b57afad14444b801ff28c6c2c7f8~mv2.png", "c": "Model"}, {"t": "vid", "id": "83b0d5_08aef53523974910940f6d65e2c92fb7", "c": "Gameplay capture"}], "short": "An asymmetric cooperative multiplayer exergame. One player runs on a treadmill, the other pedals a bike, and both escort a payload to the objective together.", "meta": [["Role", "Solo developer & designer"], ["Engine", "Unity 3D"], ["Networking", "Photon PUN 2"], ["Platform", "PC & mobile"]]}, {"slug": "workshop-vr", "title": "Workshop II — VR Experience", "sub": "University project", "date": "2025", "role": "Developer & 3D Artist", "type": "University Project · VR · Unity", "cover": "", "desc": "A virtual reality project developed during Workshop II at UTeM. Built in Unity, it explores interactive 3D environments and immersive VR design as part of my Game Technology coursework.", "tags": ["Unity", "VR", "Blender", "3D Assets"], "media": [{"t": "loc", "id": "trailer.mp4", "c": "Trailer"}, {"t": "yt", "id": "DQHG-Y6HRcI", "poster": "83b0d5_ff36225032354ed8a1c1b365c6f679e5~mv2.jpg", "c": "Full video on YouTube"}, {"t": "img", "id": "83b0d5_d22afd96836f45de96cb73303508d290~mv2.jpeg", "c": ""}, {"t": "img", "id": "83b0d5_857b336cc89448b0b849664a7a4b038d~mv2.jpeg", "c": "Asset work"}, {"t": "img", "id": "83b0d5_b3cb77034c8e4eb682d20abea2b466ad~mv2.jpg", "c": "Storyboard"}, {"t": "img", "id": "83b0d5_a6b5f51a09ee48a09d0714ec148f6f1c~mv2.jpg", "c": "Flowboard"}, {"t": "img", "id": "83b0d5_181fa6ede68e4024801144b58ad3789f~mv2.jpg", "c": "Testing"}, {"t": "img", "id": "83b0d5_01b29933d8774541b09ecbeeff6ba9f7~mv2.jpg", "c": "Testing"}, {"t": "img", "id": "83b0d5_004054372bd341479298299d3995f61f~mv2.jpg", "c": "Testing"}, {"t": "img", "id": "83b0d5_d3488e4477ed4c538da25c4d51790e9d~mv2.jpg", "c": "Testing"}, {"t": "img", "id": "83b0d5_5d9514624039417d918b16cf450b6fa5~mv2.jpg", "c": "Testing"}], "coverLoc": "trailer.mp4", "short": "A virtual reality experience built in Unity, exploring interactive 3D environments and immersive design.", "meta": [["Role", "Developer & 3D artist"], ["Engine", "Unity"], ["Platform", "VR headset"], ["Year", "2025"]]}, {"slug": "nexa-vault", "title": "Nexa Vault", "sub": "Secure employee records portal", "date": "2026", "role": "Application Development & Database", "type": "University Project · Web Security · PHP & MySQL", "cover": "83b0d5_0b261326684643339488cc0f7390e54c~mv2.png", "desc": "A secure, multi-tier web application built for my IT Security course (BITS3423) at UTeM. Nexa Vault is an employee records portal with a security-first architecture, implementing OWASP Top 10 (2021) controls including SQL injection prevention, bcrypt password hashing, XSS protection, and secure session management. The system runs across two isolated Ubuntu Server VMs on VirtualBox — a web server (Apache2/PHP) and a database server (MySQL) on a private internal network.", "tags": ["PHP", "MySQL", "Apache2", "Ubuntu Server", "OWASP Top 10"], "media": [{"t": "img", "id": "83b0d5_e611f53a7dc64ed8be8e80e992025464~mv2.png", "c": "Login page"}, {"t": "img", "id": "83b0d5_fc769e39944a44d38ea810e921287f70~mv2.png", "c": "Register page"}, {"t": "img", "id": "83b0d5_aa0b95ec1f014188aff3549f7f13d2ba~mv2.png", "c": "Dashboard"}, {"t": "img", "id": "83b0d5_592c56b4dfbf4eb7903e61f3026169e4~mv2.png", "c": ""}, {"t": "img", "id": "83b0d5_0c64309d40734f0f8747a59e6c9910b3~mv2.png", "c": "SQL injection defence (A03)"}, {"t": "img", "id": "83b0d5_f4e3a836d8d94183960a3ef58b85f31b~mv2.png", "c": "SQL injection defence (A03)"}, {"t": "img", "id": "83b0d5_644cbe3078d74dcda7c883688edcf8bc~mv2.png", "c": "Injection defence (A03)"}, {"t": "img", "id": "83b0d5_f46257fb7c524708bc436fdcc1e7336d~mv2.png", "c": "XSS defence (A03)"}, {"t": "img", "id": "83b0d5_163ace715eaf4b079a2dbf5882dc6c36~mv2.png", "c": "XSS defence — code"}, {"t": "img", "id": "83b0d5_d20218a230604fa3bf501b2e198d9448~mv2.png", "c": "Broken access control (A01)"}, {"t": "img", "id": "83b0d5_839abfe1bb8e411abadb3e4f1fb93ce7~mv2.png", "c": "Cryptographic failures (A02)"}, {"t": "img", "id": "83b0d5_53201fdcc774414183e32fed799ce7c8~mv2.png", "c": "A02 proof — register.php"}, {"t": "img", "id": "83b0d5_073ace48fcce42beb7c3076ee7b92e85~mv2.png", "c": "Password hashing"}, {"t": "img", "id": "83b0d5_430b1a84bfa34ff1ba7e6c2c5ce876e6~mv2.png", "c": "Session management (A07)"}, {"t": "img", "id": "83b0d5_28861812a0464f09aa8efb7e721fb190~mv2.png", "c": "A07 proof — logout.php"}, {"t": "img", "id": "83b0d5_2cb6481f057f4b2c814a0e5c587b16f9~mv2.png", "c": "Test A02, A03"}, {"t": "img", "id": "83b0d5_0c181b7b8ad6424b91d831dbdfad0a74~mv2.png", "c": "Firewall proof"}, {"t": "img", "id": "83b0d5_187b0869655a46f092c64b3a35a19933~mv2.png", "c": "Firewall proof — VM2"}, {"t": "img", "id": "83b0d5_7086407f86464ece8bf51ef90dd32263~mv2.png", "c": "VM2"}, {"t": "img", "id": "83b0d5_e69b3678aaf54b0cab31a5ac71d3968a~mv2.png", "c": "Netplan configuration"}, {"t": "img", "id": "83b0d5_16a2188ebebb4938b7640d350779c8ec~mv2.png", "c": "SFTP / SSH evidence"}, {"t": "img", "id": "83b0d5_cda6dd37a9b349a6bd1f6ede8c163c99~mv2.png", "c": "Database connection"}, {"t": "img", "id": "83b0d5_205e92d10b5e4b8280c2f42c07e11bfb~mv2.png", "c": "Certificate view"}], "short": "An employee records portal built security first, with OWASP Top 10 controls across two isolated Ubuntu servers.", "meta": [["Role", "App development & database"], ["Stack", "PHP, MySQL, Apache2"], ["Infra", "2 Ubuntu Server VMs"], ["Course", "BITS3423"]]}, {"slug": "graphic-design", "title": "Graphic Design Works", "sub": "Freelance & university", "date": "2024 – Present", "role": "Graphic Designer", "type": "Graphic Design", "cover": "83b0d5_c70168b862f7485ca9f15b7c0ea346ad~mv2.png", "desc": "Event posters, promotional materials, and creative collaborations produced through freelance projects and university involvement — combining visual storytelling with strong typography and composition.", "tags": ["Photoshop", "Typography", "Poster Design", "Branding"], "media": [{"t": "img", "id": "83b0d5_b7972399f7ca44f889a8b5396c0388d2~mv2.png", "c": "Poster Kejohanan"}, {"t": "img", "id": "83b0d5_8c6bc3200a124508879f71aa99393f20~mv2.png", "c": "National Open"}, {"t": "img", "id": "83b0d5_a9d1b8c3d5bf42d0918b71740d9af948~mv2.png", "c": "Match day"}, {"t": "img", "id": "83b0d5_e0a8f4ca443b4138a72a7b9927839dfd~mv2.png", "c": "Match"}, {"t": "img", "id": "83b0d5_0a13bad42049467baf743a0a51e10d86~mv2.png", "c": "Score"}, {"t": "img", "id": "83b0d5_9919976af50f4e0eb25ff19f3de8cd03~mv2.png", "c": "Individual poster"}, {"t": "img", "id": "83b0d5_94b29c78808942f9aac4af23c23dbac3~mv2.png", "c": "Individual poster"}, {"t": "img", "id": "83b0d5_330b417b731a43ad8bd25944d0df27c1~mv2.png", "c": ""}, {"t": "img", "id": "83b0d5_3e023f30988949b7bc6a357953e1bd13~mv2.png", "c": "Poster project"}], "short": "Event posters, promotional material, and creative collaborations for freelance clients and university events.", "meta": [["Role", "Graphic designer"], ["Tools", "Photoshop"], ["Type", "Freelance & university"], ["Year", "2024 to now"]]}, {"slug": "motion-graphics", "title": "Motion Graphics Project", "sub": "After Effects coursework", "date": "2025", "role": "Motion Graphics Designer", "type": "University Project · Motion Graphics", "cover": "83b0d5_fc7d70b7b98e4a4c83a62fb1f6fd5729~mv2.png", "desc": "A collection of motion graphic works created in Adobe After Effects — from animated typography to visual storytelling — developed as part of my Motion Graphics coursework at UTeM, and exhibited at a faculty showcase.", "tags": ["After Effects", "Animation", "Typography"], "media": [{"t": "yt", "id": "_W7vuIfUGyQ", "poster": "83b0d5_8b7129e32785402fb6372bedb75fd11e~mv2.jpg", "c": "Full video on YouTube"}, {"t": "vid", "id": "83b0d5_105e97f7ae604af49b6fb242928c3613", "c": ""}, {"t": "vid", "id": "83b0d5_9d2ac3c0ca044157975a2dea66d08646", "c": ""}, {"t": "vid", "id": "83b0d5_dfe6632de2c549a981d3ee650290eac5", "c": ""}, {"t": "vid", "id": "83b0d5_2ea52150a4ef4a7cb9be1099fc0a1e1d", "c": ""}, {"t": "vid", "id": "83b0d5_54477d6eae9544f8b1e5826a04545c8d", "c": ""}, {"t": "vid", "id": "83b0d5_385df43d9efa43178202860cc5d20068", "c": ""}, {"t": "vid", "id": "83b0d5_11b2cc53ad1c4c38993dee1d0b489053", "c": ""}, {"t": "vid", "id": "83b0d5_8f36fc97daef4186810284204702e674", "c": ""}, {"t": "img", "id": "83b0d5_868f59ba16fe454496d86da63c0b2a65~mv2.png", "c": "Poster — movie"}, {"t": "img", "id": "83b0d5_f6713419614842ec91318272d979a6eb~mv2.jpg", "c": "Exhibition"}, {"t": "img", "id": "83b0d5_0739ecae4b764a0597876b061ba630e6~mv2.jpg", "c": "Exhibition"}, {"t": "img", "id": "83b0d5_78eb1192baaa4ec69a1c6892d3aaaf9e~mv2.jpg", "c": "Exhibition"}, {"t": "img", "id": "83b0d5_2b58c6414357441cae8d3dcb8b463a6d~mv2.jpg", "c": "Motion graphics class"}], "short": "Animated typography and visual storytelling built in After Effects, shown at a faculty exhibition.", "meta": [["Role", "Motion graphics designer"], ["Tool", "After Effects"], ["Type", "Coursework & exhibition"], ["Year", "2025"]]}, {"slug": "3d-animation", "title": "3D Character Animation & Rendering", "sub": "Blender studies", "date": "2024", "role": "3D Artist / Animator", "type": "3D Animation · Blender", "cover": "83b0d5_e294d588faaf4de197d4d164b68b89faf000.jpg", "coverVid": "83b0d5_e294d588faaf4de197d4d164b68b89fa", "desc": "Character animations and rendered scenes created in Blender. From rigging and animating characters to composing and lighting final renders, these works cover the fundamentals of 3D animation — movement, lighting, and materials.", "tags": ["Blender", "Rigging", "Animation", "Rendering"], "media": [{"t": "vid", "id": "83b0d5_e294d588faaf4de197d4d164b68b89fa", "c": ""}, {"t": "vid", "id": "83b0d5_748729e541cc46a4afc45c2e4ec4883f", "c": ""}, {"t": "vid", "id": "83b0d5_8ecf7a4aeb1e4849874eac98c1af1abf", "c": ""}, {"t": "vid", "id": "83b0d5_641a4066f28443b184243d85c00fd120", "c": ""}, {"t": "vid", "id": "83b0d5_c14e3aaf7b204f6885f050c0e8d05175", "c": ""}, {"t": "vid", "id": "83b0d5_7a489a7642234867b7331bd22ac33cc8", "c": ""}, {"t": "vid", "id": "83b0d5_7c612e34b07b4ca394d75a4347aa95cf", "c": ""}, {"t": "vid", "id": "83b0d5_0805beb9fabe4211af91d29ebcd19aad", "c": ""}, {"t": "img", "id": "83b0d5_f4f9c6e5994a4cdd97da1f44d3b00e48~mv2.png", "c": "Character"}, {"t": "img", "id": "83b0d5_2ad055dfe4684adbbab5d5634735d23b~mv2.png", "c": "Character"}, {"t": "img", "id": "83b0d5_bf8e0f2a6c50412fbdeddae4e29f85d8~mv2.png", "c": "Character"}, {"t": "img", "id": "83b0d5_3b86fec2ff3f4ea8b21d207a9a36bc1f~mv2.png", "c": "Character"}, {"t": "img", "id": "83b0d5_d3d783d05f2349a482d396e36bac290e~mv2.png", "c": "Character animation"}, {"t": "img", "id": "83b0d5_3f69eb708946423ba24104af2731ac38~mv2.png", "c": "Character animation"}, {"t": "img", "id": "83b0d5_97f16219c41a4769bc03e919cbc97a2e~mv2.png", "c": "Character animation"}, {"t": "img", "id": "83b0d5_c7e2f2260e73436f89ef7cb9e22368d7~mv2.png", "c": "Character animation"}, {"t": "img", "id": "83b0d5_5f3d8e54018549728cba6078dc4bb555~mv2.png", "c": "Animation"}, {"t": "img", "id": "83b0d5_6a773824dc424bbda3d827acf178e8b6~mv2.png", "c": "Animation"}, {"t": "img", "id": "83b0d5_3983b172393f4f6b9d776bf3db62dd38~mv2.png", "c": "Animation"}, {"t": "img", "id": "83b0d5_da55999b359247ebbdc6347f78029eee~mv2.png", "c": "Animation"}, {"t": "img", "id": "83b0d5_fff355da471e4b7caac75c1f91dd2830~mv2.png", "c": "Robot"}, {"t": "img", "id": "83b0d5_b05c46085d964211854130cee15344ab~mv2.png", "c": "Helmet"}, {"t": "img", "id": "83b0d5_ae9b0d24048a4e90bf8d0e465a836ca2~mv2.png", "c": "Helmet"}, {"t": "img", "id": "83b0d5_b45e22979be1411190ec099ed8af6371~mv2.png", "c": "Helmet"}, {"t": "img", "id": "83b0d5_fe439f6ca1c44e4aa2d4a208deddd7dd~mv2.png", "c": "Cannon"}, {"t": "img", "id": "83b0d5_335db0aff0d6449db06130e01840a4cd~mv2.png", "c": "Cannon"}, {"t": "img", "id": "83b0d5_75f67a84f4ed41c4ab579df6a55e74b3~mv2.png", "c": "Cannon"}, {"t": "img", "id": "83b0d5_e44a056f401c4466a03647b08e07da1d~mv2.png", "c": "Cannon"}, {"t": "img", "id": "83b0d5_687262befcb94a668c84975ab82cf786~mv2.png", "c": "Hammer"}, {"t": "img", "id": "83b0d5_02cb213ffcfa4e99b4a0c5dd8d6fbed8~mv2.png", "c": "Owl"}, {"t": "img", "id": "83b0d5_a9a4e217ed60425db5d0d5dfef7a6fe8~mv2.png", "c": "Owl"}, {"t": "img", "id": "83b0d5_fda60d5f12d74f25a187c7d14d8176e8~mv2.png", "c": "Table"}, {"t": "img", "id": "83b0d5_0e3c9eb5c1d24236a40319e8858d1e00~mv2.png", "c": "Table"}, {"t": "img", "id": "83b0d5_3867a2d56046426dbb35da33be4ea195~mv2.png", "c": "Table"}, {"t": "img", "id": "83b0d5_284e97d9baed4cdcb5a4f8ed71b9b9d7~mv2.png", "c": "Table"}, {"t": "img", "id": "83b0d5_90ca50a4fcf7480ab639b7170cbeed39~mv2.png", "c": "Table"}, {"t": "img", "id": "83b0d5_a5b1b5270fc84643b44877d53faee1a2~mv2.png", "c": "Table"}, {"t": "img", "id": "83b0d5_f7bfc746d729450588ad85479b960444~mv2.png", "c": "Chair"}, {"t": "img", "id": "83b0d5_10585d9027664c67806c336f7d05fddd~mv2.png", "c": "Chair"}, {"t": "img", "id": "83b0d5_bcf580a5106441deb1135850748aa3d1~mv2.png", "c": ""}], "short": "Characters, props, and environments modelled, rigged, lit, and rendered in Blender.", "meta": [["Role", "3D artist & animator"], ["Tool", "Blender"], ["Focus", "Modelling, rigging, rendering"], ["Year", "2024"]]}];
+
+const M = "https://static.wixstatic.com/media/";
+const V = "https://video.wixstatic.com/video/";
+const fit  = (id,w) => M + id + "/v1/fit/w_" + w + ",h_" + w + ",q_88,enc_avif,quality_auto/" + id;
+const fill = (id,w,h) => M + id + "/v1/fill/w_" + w + ",h_" + h + ",al_c,q_88,enc_avif,quality_auto/" + id;
+const raw  = id => M + id;
+const vposter = id => M + id + "f000.jpg";
+const mp4  = id => V + id + "/480p/mp4/file.mp4";
+const sources = id => ["480p","720p","1080p"]
+  .map(function(r){ return '<source src="' + V + id + "/" + r + '/mp4/file.mp4" type="video/mp4">'; }).join("");
+
+/* If a resized URL fails, fall back to the original file. */
+document.addEventListener('error', function(e){
+  var el = e.target;
+  if (el.tagName === 'IMG' && el.dataset.raw && el.src !== el.dataset.raw) el.src = el.dataset.raw;
+}, true);
+
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var mobile = function(){ return window.innerWidth <= 860; };
+
+  /* ---------- project cards ---------- */
+  var grid = document.getElementById('grid');
+  PROJECTS.forEach(function(p, i){
+    var card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'card' + (i === 0 ? ' card--lead' : '');
+
+    var cover;
+    if (p.coverLoc)
+      cover = '<video muted loop playsinline preload="metadata" data-auto src="' + p.coverLoc + '"></video>';
+    else if (p.coverVid)
+      cover = '<video muted loop playsinline preload="metadata" data-auto referrerpolicy="no-referrer" poster="' + vposter(p.coverVid) + '">' + sources(p.coverVid) + '</video>';
+    else
+      cover = '<img src="' + fill(p.cover, 900, 560) + '" data-raw="' + raw(p.cover) + '" alt="' + p.title + '" loading="lazy">';
+
+    var media = '<div class="card__media">' + cover +
+      '<span class="card__count">' + p.media.length + ' items</span></div>';
+
+    var spec = '<div class="spec">' + p.meta.map(function(m){
+      return '<div><em>' + m[0] + '</em><b>' + m[1] + '</b></div>';
+    }).join('') + '</div>';
+
+    var text =
+      '<span class="card__no">' + p.sub.toUpperCase() + '</span>' +
+      '<h3>' + p.title + '</h3>' +
+      '<p>' + p.short + '</p>' + spec +
+      '<span class="card__open">Open gallery →</span>';
+
+    card.innerHTML = i === 0
+      ? '<div class="card--lead__text">' + text + '</div>' + media
+      : media + text;
+
+    card.addEventListener('click', function(){ openSheet(i); });
+    grid.appendChild(card);
+  });
+
+  /* ---------- project sheet ---------- */
+  var sheet = document.getElementById('sheet');
+  var gal = document.getElementById('sheetGal');
+  var lastFocus = null;
+
+  function openSheet(i){
+    var p = PROJECTS[i];
+    lastFocus = document.activeElement;
+    document.getElementById('sheetBar').textContent = p.title;
+    document.getElementById('sheetSub').textContent = p.sub;
+    document.getElementById('sheetTitle').textContent = p.title;
+    document.getElementById('sheetDesc').textContent = p.desc;
+    document.getElementById('sheetDate').textContent = p.date;
+    document.getElementById('sheetRole').textContent = p.role;
+    document.getElementById('sheetType').textContent = p.type;
+
+    gal.innerHTML = p.media.map(function(m){
+      var cap = m.c ? '<figcaption>' + m.c + '</figcaption>' : '';
+      if (m.t === 'img')
+        return '<figure class="shot"><img src="' + fit(m.id, 1400) + '" data-raw="' + raw(m.id) + '" alt="' + (m.c || p.title) + '" loading="lazy">' + cap + '</figure>';
+      if (m.t === 'loc')
+        return '<figure class="shot shot--wide"><video controls playsinline preload="metadata" src="' + m.id + '"></video>' + cap + '</figure>';
+      if (m.t === 'vid')
+        return '<figure class="shot"><video controls playsinline preload="metadata" referrerpolicy="no-referrer" poster="' + vposter(m.id) + '">' + sources(m.id) + '<a href="' + mp4(m.id) + '" target="_blank" rel="noopener">Open video</a></video>' + cap + '</figure>';
+      return '<figure class="shot shot--wide"><a class="shot__yt" href="https://youtu.be/' + m.id + '" target="_blank" rel="noopener">' +
+             '<img src="' + fit(m.poster, 1400) + '" data-raw="' + raw(m.poster) + '" alt="' + (m.c || p.title) + '" loading="lazy"></a>' + cap + '</figure>';
+    }).join('');
+
+    sheet.classList.add('is-open');
+    document.body.classList.add('locked');
+    sheet.scrollTop = 0;
+    document.getElementById('sheetClose').focus();
+  }
+
+  function closeSheet(){
+    sheet.classList.remove('is-open');
+    document.body.classList.remove('locked');
+    gal.innerHTML = '';
+    if (lastFocus) lastFocus.focus();
+  }
+  document.getElementById('sheetClose').addEventListener('click', closeSheet);
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && sheet.classList.contains('is-open')) closeSheet();
+  });
+
+  /* ---------- the payload heats up as it advances ---------- */
+  var track = document.getElementById('track');
+  var done = document.getElementById('done');
+  var payload = document.getElementById('payload');
+  var cps = Array.prototype.slice.call(document.querySelectorAll('.cp'));
+  var top = document.getElementById('top');
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  function update(){
+    var max = document.body.scrollHeight - window.innerHeight;
+    var p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+    var pct = (p * 100) + '%';
+    var r = track.getBoundingClientRect();
+    if (mobile()) {
+      done.style.width = pct; done.style.height = '3px';
+      done.style.backgroundSize = r.width + 'px 100%';
+      payload.style.left = pct; payload.style.top = '50%';
+    } else {
+      done.style.height = pct; done.style.width = '2px';
+      done.style.backgroundSize = '100% ' + r.height + 'px';
+      payload.style.top = pct; payload.style.left = '50%';
+    }
+    top.classList.toggle('is-stuck', window.scrollY > 20);
+    cps.forEach(function(cp){
+      var el = document.getElementById(cp.dataset.cp);
+      if (!el) return;
+      var b = el.getBoundingClientRect();
+      cp.classList.toggle('is-on', b.top < window.innerHeight * 0.5 && b.bottom > 120);
+    });
+  }
+  window.addEventListener('scroll', update, {passive:true});
+  window.addEventListener('resize', update);
+  update();
+
+  /* ---------- reveals and skill meters ---------- */
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (!e.isIntersecting) return;
+        e.target.classList.add('is-in');
+        e.target.querySelectorAll('.meter__fill').forEach(function(f){ f.style.width = f.dataset.fill + '%'; });
+        io.unobserve(e.target);
+      });
+    }, {threshold:0.12});
+    document.querySelectorAll('.rise').forEach(function(el){ io.observe(el); });
+  } else {
+    document.querySelectorAll('.rise').forEach(function(el){ el.classList.add('is-in'); });
+    document.querySelectorAll('.meter__fill').forEach(function(f){ f.style.width = f.dataset.fill + '%'; });
+  }
+
+  /* ---------- loop card videos while on screen ---------- */
+  if (!reduce && 'IntersectionObserver' in window) {
+    var vio = new IntersectionObserver(function(en){
+      en.forEach(function(e){
+        if (e.isIntersecting) { e.target.play().catch(function(){}); } else { e.target.pause(); }
+      });
+    }, {threshold:0.25});
+    document.querySelectorAll('video[data-auto]').forEach(function(v){ v.muted = true; vio.observe(v); });
+  }
+
+  /* ---------- copy email ---------- */
+  var copy = document.getElementById('copy');
+  copy.addEventListener('click', function(){
+    navigator.clipboard.writeText('harithazmeerizal@gmail.com').then(function(){
+      copy.textContent = 'Copied';
+      setTimeout(function(){ copy.textContent = 'Copy email address'; }, 1800);
+    }).catch(function(){ copy.textContent = 'harithazmeerizal@gmail.com'; });
+  });
+})();
+</script>
+</body>
+</html>
